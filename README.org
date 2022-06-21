@@ -14,7 +14,13 @@ Should you use this config? Probably, not. As of yet, it is incomplete and messy
 
 For whom this document? Mostly, it is for my future self. But you are welcome to read it too. I have an ambition to turn it into a good resource for my students who may get interested in GNU Emacs and the hidden curriculum (I may explain this later).
 * Why I use GNU Emacs
-I have come to realize that I am a writer. I use writing to think, I write academic manuscripts, I write to organize my projects, and I write to communicate with computes (code), other humans and myself. My life demands a lot writing from me.
+I have come to realize that I am a writer. I use writing
+- to think,
+- to write academic manuscripts,
+- to organize my projects,
+- to communicate with: computes (code), other humans and myself.
+
+  My life demands from me a lot writing.
 
 To keep this part of my life functional, I need a robust system that:
 
