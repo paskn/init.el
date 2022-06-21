@@ -1,0 +1,32 @@
+#+author: Sergei Pashakhin
+#+title: My ~init.el~
+#+DATE: <2022-06-21 Tue>
+#+EMAIL: pashakhin@gmail.com
+* Introduction
+This file documents my GNU Emacs configuration, and explains my choices in this process. This file is intended to be perpetually a work in progress.
+
+Should you use this config? Probably, not. As of yet, it is incomplete and messy. The startup time of this config on my MBP (2015) is 26.032273 second. There are better configs and sources explaining GNU Emacs and how to use it. For instance, see:
+
+- Excellent [[https://systemcrafters.net/videos/][video series]] by David Wilson;
+- Get inspired by [[https://plain-text.co/][The Plain Person's Guide to Plain Text Social Science]] by Kieran Healy;
+- Read [[https://www.gnu.org/software/emacs/manual/html_node/emacs/index.html][the manual]];
+- Take a look at this [[https://github.com/jkitchin/scimax][cool starterkit]] for scientist by John Kitchen and learn about GNU Emacs on his [[https://www.youtube.com/c/JohnKitchin][youtube channel]].
+
+For whom this document? Mostly, it is for my future self. But you are welcome to read it too. I have an ambition to turn it into a good resource for my students who may get interested in GNU Emacs and the hidden curriculum (I may explain this later).
+* Why I use GNU Emacs
+I have come to realize that I am a writer. I use writing to think, I write academic manuscripts, I write to organize my projects, and I write to communicate with computes (code), other humans and myself. My life demands a lot writing from me.
+
+To keep this part of my life functional, I need a robust system that:
+
+- independent from a centralized institution that owns the system and can render it unusable to me;
+- transparent in what and how it does what I aim to do;
+- does not require money from me to keep using it;
+- supported by a good community that can help me solve my problems with a system;
+- surrounded by smart and decent humans from whom it is a privilege to learn;
+- covers all aspects of my writing and can be extended to cover any arising needs in the writing part of my life.
+
+To learn that I have these need was a journey. Some of them I could only understand when I started exploring GNU Emacs and learned the role of R and Python communities in science. Others I learned through frustrating experience with tools and approaches I was exposed to during my education and work. Through poverty and precariousness I learned the rest. I do not wish it upon myself to go through this journey again or to anyone else, when it is perfectly possible to avoid. That is why I write this document.
+
+Ultimately, what I gain from this writing, GNU Emacs and its community, is the level of autonomy and security that is not provided to me by any other tool. For instance, if I want to change something in GNU Emacs, I can do it either myself or with the help of the community. If I want to do anything, it is more likely than not that I am able to do it with GNU Emacs. At first, it can be hard to understand. But if you have personal experience of maintenance of any thing or tool, you can grasp it though it. It is like gardening, arranging a life of your character in a Sims game or building your character in a RPG, maintaining your favorite bike or setting up your new laptop for your digital life and work. It is the similar feeling and process resulting in a state that you find the most appropriate for yourself. And the end result enables you to flow in whatever you do with it while experiencing joy and satisfaction.
+
+  
