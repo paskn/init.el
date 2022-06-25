@@ -20,7 +20,7 @@ I have come to realize that I am a writer. I use writing
 - to organize my projects,
 - to communicate with: computes (code), other humans and myself.
 
-  My life demands from me a lot writing.
+  My life demands from me a lot of writing.
 
 To keep this part of my life functional, I need a robust system that:
 
@@ -31,8 +31,29 @@ To keep this part of my life functional, I need a robust system that:
 - surrounded by smart and decent humans from whom it is a privilege to learn;
 - covers all aspects of my writing and can be extended to cover any arising needs in the writing part of my life.
 
-To learn that I have these need was a journey. Some of them I could only understand when I started exploring GNU Emacs and learned the role of R and Python communities in science. Others I learned through frustrating experience with tools and approaches I was exposed to during my education and work. Through poverty and precariousness, I learned the rest. I do not wish it upon myself to go through this journey again or to anyone else, when it is perfectly possible to avoid. That is why I write this document.
+To learn that I have these needs was a journey. Some of them I could only understand when I started exploring GNU Emacs, and when I  learned the role of R and Python communities in science. Other needs I learned through frustrating experience with tools and approaches I was exposed to during my education and work. Through poverty and precariousness, I learned the rest of them. I do not wish it upon myself or anyone else to go through this journey, when it is perfectly possible to avoid. That is why I write this document.
 
-Ultimately, what I gain from this writing, GNU Emacs and its community, is the level of autonomy and security that is not provided to me by any other tool. For instance, if I want to change something in GNU Emacs, I can do it either myself or with the help of the community. If I want to do anything, it is more likely than not that I am able to do it with GNU Emacs. At first, it can be hard to understand. But if you have personal experience of maintenance of any thing or tool, you can grasp it though it. It is like gardening, arranging a life of your character in a Sims game or building your character in a RPG, maintaining your favorite bike or setting up your new laptop for your digital life and work. It is the similar feeling and process resulting in a state that you find the most appropriate for yourself. And the end result enables you to flow in whatever you do with it while experiencing joy and satisfaction.
+Ultimately, what I gain from this writing, GNU Emacs and its community, is the level of autonomy and security that is not provided to me by any other tool. For instance, if I want to change something in GNU Emacs, I can do it either myself or with the help from the community. If I want to do anything, it is more likely than not that I can to do it with GNU Emacs. At first, it can be hard to understand. But if you have personal experience of maintenance of a thing or a tool, you can grasp it though it. It is like gardening, arranging a life of your character in a Sims game or building your character in a RPG, maintaining your favorite bicycle or setting up your new laptop for digital life and work. It is the similar feeling and process resulting in a state that you find the most appropriate for yourself. And the end result enables you to flow in whatever you do with it while experiencing joy and satisfaction.
+** It is like riding a bicycle
+The bicycle metaphor is really great at highlighting another important point in my answer. How come a human can learn to ride a bicycle and then after  years without actually doing it they can hop on and ride it again? Once you know how to ride, you do not have to be aware of you leg and arm movements to ride. This complex task is delegated to the part of the brain that can manage with little input from the conscious.
+
+Is it possible, then, to have the same level of fluidity with the tasks involving a computer and writing? Yes, just look at the history of typewriters. Take a look at this BBC video ([[https://www.youtube.com/watch?v=b6URa-PTqfA][Youtube]], 12min). Typing was an actual trade. You could complete a course on typing and find a job where you just type stuff other people say or write. You can still find such a course and learn how to stop staring on your keyboard. Your fingers will just move automatically and the words will appear on your screen. It is amazing. But what about the other stuff you have do on your computer that does not involve typing?
+
+There are too many stuff to click on. Let's get back to the BBC video: take a look at screens or their absence. To use your computer for writing, you do not need to use your mouse. With the help from my fingers and an arm, this arrow on the screen has to traverse thousand of pixels, navigate through lands of menus and forests of buttons just to put a page number on my document. I am tired of this nonsense. I have become reluctant sparing my precious little focus points on such stuff. Because I learned that there is a better deal: spend your focus points on thinking and let your fingers type their way though the nonsense of navigating your menus and buttons. To get the deal, you have to learn how to ride your computer with hot keys or key bindings.
+
+By design, you do not have to use your mouse at all to use GNU Emacs. Everything is done by pressing buttons on the keyboard. It is fast, straightforward and easy. You can stop the annoying nonsense of clicking through tabs, menus, and buttons on the screen to do something as simple as drawing a table or fixing indentation of list items. Typing is faster than writing by hand and navigating with the mouse. With practice you can internalize this skill the same way you internalize the skill of riding a bicycle. My mind is freer when I type, my focus improves, and it make easier for me to handle my procrastination and writing blocks. So far, I have no ideas why this is so helpful for me. 
 * How this document is organized
 My aim is to break down my ~init.el~ by meaningful tasks that I do with GNU Emacs. I realize that some thing require linear order to present for GNU Emacs unlike the human brain. I will point it out when necessary. First, I will discuss the core set up underlining every other task. Then, I discuss the visual aspect of my GNU Emacs. The rest will be presented by specific tasks: general writing and publishing, organizing tasks and notes, writing code, maintaining projects, and everything that  improves them.
+* GNU Emacs: Installation and the bare minimum settings
+At the moment, my only computer is MBP-2015 with MacOS Big Sur. I am happy with this machine, but afraid that it may break down soon. As a consequence, I try keeping it in the best shape I can. Thus, this section will be relevant only to MacOS users.
+
+There are several ways to get GNU Emacs on your MacOS. I find that the best way is to use ~homebrew~.
+
+#+NAME: install_emacs_brew
+#+begin_src shell :eval never
+  brew install emacs
+#+end_src
+
+The only downside of this installation is that you will not have the build-in support for ~SVG~ files. This might get solved later, or I may have to compile GNU Emacs myself. Unfortunately, I really need the ~SVG~ support.
+
+
