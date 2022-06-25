@@ -55,5 +55,114 @@ There are several ways to get GNU Emacs on your MacOS. I find that the best way 
 #+end_src
 
 The only downside of this installation is that you will not have the build-in support for ~SVG~ files. This might get solved later, or I may have to compile GNU Emacs myself. Unfortunately, I really need the ~SVG~ support.
+** Setting up
+To change anything in your GNU Emacs, you have to edit a file named ~init.el~. Usually, it is located in ~/Users/[your_username]/.emacs.d/init.el~. I enjoy this quick way of opening it:
+
+- press =M-:= (reads =Ctrl-:= on my computer) and type the elisp command:
+
+#+NAME: find_init_file
+#+begin_src emacs-lisp :eval never
+  (find-file user-init-file)
+#+end_src
+
+This will open the buffer with your ~inti.el~ in GNU Emacs. Now you can mold your GNU Emacs into anything you want by editing this file.
+
+The first thing we have to set up is organization of the ~init.el~ and how GNU Emacs works with packages. The chunk below sets up a list of repositories where GNU Emacs should look for packages. Another thing it does is activating =use-package= which helps to organize the ~init.el~ in a neat syntax simplifying the way packages are configured.
+
+#+NAME: use_package
+#+begin_src emacs-lisp :eval never
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			 ("org" . "https://orgmode.org/elpa/")
+			 ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
+(unless 'package-archives-contents
+  (package-refresh-contents))
+
+;; initialize use-package
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+#+end_src
+
+Now, we can adjust the default behavior of GNU Emacs. This chunk will make =Esc= more useful by binding to it the intuitive action of canceling the prompt for a command.
+
+#+NAME: use_esc_key_promt
+#+begin_src emacs-lisp :eval never
+  ;; use ESC to cancel prompt
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+end_src
+
+Adjust a set basic defaults:
+
+#+NAME: initial_defaults
+#+begin_src emacs-lisp :eval never
+  ;; Start maximised (cross-platf)
+  (add-hook 'window-setup-hook 'toggle-frame-maximized t)
+  ;; stop emacs expecting that a sentence ends with double space
+  (setq sentence-end-double-space nil)
+  ;; stretch cursor to full char.-width, i.e. make tabs visible
+  (setq x-stretch-cursor t)
+  ;; show recent files with M-x recentf-open-file
+  (recentf-mode 1)
+  ;; automatically update buffer with changed files
+  (global-auto-revert-mode 1)
+  (setq global-auto-revert-non-file-buffers t)
+  (setq inhibit-startup-message t) ;; hide the startup message
+  (scroll-bar-mode -1)        ; Disable visible scrollbar
+  (tool-bar-mode -1)          ; Disable the toolbar
+  (tooltip-mode -1)           ; Disable tooltips
+  (set-fringe-mode 10)        ; Give some breathing room
+
+  (menu-bar-mode -1)            ; Disable the menu bar
+
+  (column-number-mode)
+  ;; this boy drives me nuts on pdf-view-mode
+  ;; activate line-numbers in specific modes as necessary
+  ;;(global-display-line-numbers-mode t)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+  (global-hl-line-mode t)
+
+  ;; disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook
+                  pdf-view-mode
+                  pdf-tools))
+    (add-hook mode(lambda () (setq display-line-numbers nil))))
+
+  (setq visible-bell t)
+  ;; Configure terminals
+
+  (use-package term
+    :config
+    (setq explicit-shell-file-name "bash")
+    (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
+
+  (use-package eterm-256color
+    :hook (term-mode . eterm-256color-mode))
+
+  ;; hide dot files by default
+  (use-package dired-hide-dotfiles
+    :hook (dired-mode . dired-hide-dotfiles-mode)
+    :config
+    (define-key dired-mode-map "." 'dired-hide-dotfiles-mode))
+#+end_src
+
+  Some times I like using GNU Emacs in my terminal. As a terminal I use iTerm2. The following chunk makes it possible to use mouse when GNU Emacs runs in iTerm2. This can be helpful if you struggle with the navigation key bindings. I keep this chunk just to be safe.
+
+#+NAME: iTerm2_mouse
+#+begin_src emacs-lisp :eval never
+    (unless window-system
+      (require 'mouse)
+      (xterm-mouse-mode t)
+      (defun track-mouse (e)) 
+      (setq mouse-sel-mode t))
+#+end_src
+
 
 
