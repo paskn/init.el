@@ -43,6 +43,22 @@
 (unless 'package-archives-contents
   (package-refresh-contents))
 
+;; trying straight.el
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
+
 ;; initialize use-package
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
@@ -61,13 +77,18 @@
 ;; amx to help with ivy-m-x suggestions 
 (use-package amx
   :ensure t
-  :afte ivy
+  :after ivy
   :custom
   (amx-backend 'auto)
   (amx-save-file "~/Documents/personal/emacs/amx-items")
   (amx-history-length 50)
   :config
   (amx-mode 1))
+
+;; track changes in the buffer in a tree-like structure
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode 1))
 
 ;; Doom-modeline
 (use-package all-the-icons)
@@ -85,7 +106,7 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t
 	doom-themes-enable-italic t)
-  (load-theme 'catppuccin)
+  (load-theme 'catppuccin t)
 ;;   (load-theme 'doom-monokai-spectrum t)
 
   ;; Enable flashing mode-line on errors
@@ -147,6 +168,14 @@
   :ensure t
   :config
   (global-set-key (kbd "C-0") #'embrace-commander))
+
+(use-package multiple-cursors
+  :bind
+  ("C-`" . 'mc/edit-lines))
+
+;; store and manage window configuration
+;; C-c <left> and C-c <right>
+(winner-mode 1)
 
 (use-package ace-window)
 (global-set-key (kbd "M-o") 'ace-window)
@@ -543,6 +572,9 @@
 (global-set-key [remap dabbrev-expand] 'hippie-expand)
 
 ;; completion in prog-mode
+(use-package svg-lib
+  :straight (svg-lib :type git :host github :repo "rougier/svg-lib"))
+
 (use-package kind-icon
   :ensure t
   :after corfu
@@ -550,28 +582,21 @@
   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
 (use-package corfu
-;;  :straight (:files (:defaults "extensions/*.el"))
-;;  :after-call post-self-insert-hook
-  :custom
-  (corfu-auto t)
-  (corfu-auto-delay 0.05)
-  (corfu-auto-prefix 2)
-  (corfu-cycle t)
-  (corfu-preselect-first nil)
-  (corfu-on-exact-match nil)
-  :bind
-  (nil
-   :map corfu-map
-   ("TAB" . corfu-next)
-   ([tab] . corfu-next)
-   ("S-TAB" . corfu-previous)
-   ([backtab] . corfu-previous)
-   ("M-n" . nil)
-   ("M-p" . nil))
   :config
   (add-to-list 'corfu-margin-formatters #'+corfu-icons-margin-formatter)
   (global-corfu-mode))
+
+;; fuzzy search for corfu
+(use-package orderless
+  :init
+  ;; Configure a custom style dispatcher (see the Consult WiFi)
+  ;;(setq orderless-style-dispatchers '(+orderless-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
 
 (use-package corfu-doc
   :init
@@ -617,11 +642,15 @@
 
 ;; Language Servers
 (use-package lsp-mode
-  :commands (lsp lsp-deferred)
+  :custom
+  (lsp-completion-provider :none) ;; we use Corfu!
   :init
-  (setq lsp-keymap-prefix "C-c C-l")
-  :config
-  (lsp-enable-which-key-integration t))
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless))) ;; Configure orderless
+  :hook
+  (lsp-completion-mode . my/lsp-mode-setup-completion)
+  (python-mode . lsp))
 
 (use-package lsp-jedi
   :ensure t
@@ -629,22 +658,6 @@
   (with-eval-after-load "lsp-mode"
     (add-to-list 'lsp-disabled-clients 'pyls)
     (add-to-list 'lsp-enabled-clients 'jedi)))
-
-;; (use-package company
-;;   :after lsp-mode
-;;   :hook (lsp-mode . company-mode)
-;;   :bind (:map company-active-map
-;;          ("<tab>" . company-complete-selection))
-;;         (:map lsp-mode-map
-;;          ("<tab>" . company-indent-or-complete-common))
-;;   :custom
-;;   (company-minimum-prefix-length 1)
-;;   (company-idle-delay 0.0)
-;;   :config
-;;   (setq ess-use-company 'script-only))
-
-;; (use-package company-box
-;;   :hook (company-mode . company-box-mode))
 
 ;; Configure terminals
 
@@ -792,7 +805,7 @@ abort completely with `C-g'."
  '(org-agenda-files
    '("/Users/psd/Documents/personal/docs/HEL-PhD/02-research-proposal.org" "/Users/psd/Documents/personal/Tasks.org" "/Users/psd/Documents/personal/txts/20220302_notes.org" "/Users/psd/Documents/linis/SocSig2/2022_outline.org"))
  '(package-selected-packages
-   '(kind-icon change-inner company-graphviz-dot graphviz-dot-mode julia-mode poly-R poly-markdown ess valign cape corfu-doc corfu smartparens dashboard volatile-highlights embrace focus dimmer catppuccin-theme citeproc-org citeproc citeproc-el magit flycheck langtool beacon dired-hide-dotfiles all-the-icons-dired exec-path-from-shell conda expand-region org-roam writeroom-mode writeroom org-bullets guru-mode imenu-list dired-single eterm-256color company-box company lsp-jedi lsp-mode ace-window doom-themes helpful ivy-rich which-key rainbow-delimiters doom-modeline ivy markdown-mode material-theme better-defaults))
+   '(undo-tree orderless amx multiple-cursors kind-icon change-inner company-graphviz-dot graphviz-dot-mode julia-mode poly-R poly-markdown ess valign cape corfu-doc corfu smartparens dashboard volatile-highlights embrace focus dimmer catppuccin-theme citeproc-org citeproc citeproc-el magit flycheck langtool beacon dired-hide-dotfiles all-the-icons-dired exec-path-from-shell conda expand-region org-roam writeroom-mode writeroom org-bullets guru-mode imenu-list dired-single eterm-256color company-box company lsp-jedi lsp-mode ace-window doom-themes helpful ivy-rich which-key rainbow-delimiters doom-modeline ivy markdown-mode material-theme better-defaults))
  '(pdf-view-use-scaling t)
  '(python-shell-interpreter "python3")
  '(vc-annotate-background nil)

@@ -1,7 +1,8 @@
-#+author: Sergei Pashakhin
-#+title: My ~init.el~
+#+TITLE: My ~init.el~
+#+AUTHOR: Sergei Pashakhin
 #+DATE: <2022-06-21 Tue>
 #+EMAIL: pashakhin@gmail.com
+
 * Introduction
 This file documents my GNU Emacs configuration, and explains my choices in this process. This file is intended to be perpetually a work in progress.
 
@@ -88,15 +89,37 @@ The first thing we have to set up is organization of the ~init.el~ and how GNU E
 (setq use-package-always-ensure t)
 #+end_src
 
-Now, we can adjust the default behavior of GNU Emacs. This chunk will make =Esc= more useful by binding to it the intuitive action of canceling the prompt for a command.
+Sometimes I need a package that cannot be installed from =package-archives=. =straignt.el= can help with that.
+
+#+begin_src emacs-lisp :eval never
+      ;; First, place the following bootstrap code in your init-file:
+        (defvar bootstrap-version)
+        (let ((bootstrap-file
+               (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+              (bootstrap-version 5))
+          (unless (file-exists-p bootstrap-file)
+            (with-current-buffer
+                (url-retrieve-synchronously
+                 "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+                 'silent 'inhibit-cookies)
+              (goto-char (point-max))
+              (eval-print-last-sexp)))
+          (load bootstrap-file nil 'nomessage))
+  ;; Users of Emacs versions >= 27 will want to add:
+  ;;  (setq package-enable-at-startup nil)
+  ;; install use-package with straight.el to make them work together
+  (straight-use-package 'use-package)
+#+end_src
+
+  Now, we can adjust the default behavior of GNU Emacs. This chunk will make =Esc= more useful by binding to it the intuitive action of canceling the prompt for a command.
 
 #+NAME: use_esc_key_promt
 #+begin_src emacs-lisp :eval never
-  ;; use ESC to cancel prompt
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+    ;; use ESC to cancel prompt
+    (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+end_src
 
-Adjust a set basic defaults:
+Adjust a set of basic defaults:
 
 #+NAME: initial_defaults
 #+begin_src emacs-lisp :eval never
