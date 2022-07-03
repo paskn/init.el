@@ -186,6 +186,143 @@ Adjust a set of basic defaults:
       (defun track-mouse (e)) 
       (setq mouse-sel-mode t))
 #+end_src
+** Visual Experience
+This part is complex and it is not organized well at the moment. Overall, it changes default font, how buffers look, and adds and changes some UI parameters. This also sets the theme.
 
+#+begin_src emacs-lisp :eval never
+      ;; set the default font 
+      (set-face-attribute 'default nil :font "Ubuntu Mono")
+      ;; enlarge the defaul font size
+      (set-face-attribute 'default nil :height 145)
+      ;; Add icons to UI
+    (use-package all-the-icons)
+    ;; use icons in dired
+    (use-package all-the-icons-dired
+      :hook (dired-mode . all-the-icons-dired-mode))
+    ;; use some visual elements of doom-emacs
+    (use-package doom-modeline
+      :ensure t
+      :init (doom-modeline-mode 1))
+    (use-package doom-themes
+      :ensure t
+      :config
+      ;; Global settings (defaults)
+      (setq doom-themes-enable-bold t
+            doom-themes-enable-italic t)
+      (load-theme 'catppuccin t)
+      ;; Enable flashing mode-line on errors
+      (doom-themes-visual-bell-config)
+      ;; Corrects (and improves) org-mode's native fontification.
+      (doom-themes-org-config))
+    ;; the theme I fancy at the moment
+    (use-package catppuccin-theme
+     :config
+     (setq catppuccin-height-title1 1.5))
+    ;; adds a cozy welcoming screen
+    (use-package dashboard
+      :ensure t
+      :config
+      (dashboard-setup-startup-hook))
+    (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+  ;; some help with focus
+  ;; dims inactive windows
+  (use-package dimmer
+    :ensure t
+    :config
+    (dimmer-configure-which-key)
+    (dimmer-mode t)
+    (setq dimmer-fraction 0.5))
+;; inside a buffer dims everything outside of the revised element
+  (use-package focus
+    :ensure t
+    :config
+    (focus-mode t))
+;; highlight regions affected by an action
+  (use-package volatile-highlights
+    :ensure t
+    :config
+    (volatile-highlights-mode t))
+
+#+end_src
+
+*** UI and navigation
+GNU Emacs is the best with a completion framework in the mini-buffer. Such framework can quickly filter through lists of option to find the right thing you want to do. This is especially helpful when you are not as familiar with a mode to rely completely on key-binding.
+
+There are several approaches to completion in the mini-buffer. My current configuration relies on =IVY=. Although, I am thinking about replacing it with something less heavy and a bit more modern. =IVY= comes with a set of extensions called =counsel= that plug it =IVY= into standard Emacs command like search. Overall, such set up aims to improve discoverability actions and other stuff in Emacs.
+
+Navigation in Emacs is not limited to the mini-buffer. There is navigation between buffers, windows and inside a buffer. =ace-window= allows you to cycle through opened windows with =M-o=. =counsel= helps you quickly sort through opened buffers. And =avy= allows you quickly jump anywhere on the screen with =M-s=.
+
+#+begin_src emacs-lisp :eval never
+                    (use-package ivy
+                      :config
+                       (global-set-key (kbd "C-c o") 'counsel-outline)
+                       (ivy-mode 1))
+                  ;; amx to help with ivy-m-x suggestions 
+                  (use-package amx
+                    :ensure t
+                    :after ivy
+                    :custom
+                    (amx-backend 'auto)
+                    (amx-save-file "~/Documents/personal/emacs/amx-items")
+                    (amx-history-length 50)
+                    :config
+                    (amx-mode 1))
+                  ;; history of minibuffer
+                (use-package savehist
+                  :config
+                  (setq savehist-file (locate-user-emacs-file "savehist"))
+                  (setq history-length 10000)
+                  (setq history-delete-duplicates t)
+                  (setq savehist-save-minibuffer-history t)
+                  (savehist-mode)
+                  (setq ivy-display-style 'fancy))
+              ;; integrates ivy deeper into the core emacs
+                (use-package counsel
+                  :bind (("M-x" . counsel-M-x)
+                         ("C-x b" . counsel-ibuffer)
+                         ("C-x C-f" . counsel-find-file)
+                         ("C-c C-j" . 'counsel-switch-buffer)
+                         :map minibuffer-local-map
+                         ("C-r" . 'counsel-minibuffer-history))
+                  :config
+                  (counsel-mode 1)
+                   ;; Don't start searches with ^
+                  (setq ivy-initial-inputs-alist nil)
+                            ;; change the standart isearch C-s with swiper
+              (global-set-key (kbd "C-s") 'swiper))
+  ;; improve the looks of ivy
+  (use-package all-the-icons-ivy-rich
+  :ensure t
+  :init (all-the-icons-ivy-rich-mode 1))
+        (use-package ivy-rich
+        :init
+        (ivy-rich-mode 1))
+              ;; improves acess to the documentation and help
+                (use-package helpful
+                  :custom
+                  (counsel-describe-function-function #'helpful-callable)
+                  (counsel-describe-variable-function #'helpful-variable)
+                  :bind
+                  ([remap describe-function] . helpful-function)
+                  ([remap describe-symbol] . helpful-symbol)
+                  ([remap describe-variable] . helpful-variable)
+                  ([remap describe-command] . helpful-command)
+                  ([remap describe-key] . helpful-key))
+      ;; provides a helpful message describing keys and their actions
+        (use-package which-key
+        :init (which-key-mode)
+        :diminish which-key-mode
+        :config
+        (setq wich-key-idle-delay 0.3))
+        ;; cycle through windows
+              (use-package ace-window
+                :config
+                (global-set-key (kbd "M-o") 'ace-window))
+        ;; jump anywher on the screen
+        (use-package avy
+          :ensure t
+          :bind (("M-s" . avy-goto-word-1)))
+  #+end_src
 
 

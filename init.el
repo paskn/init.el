@@ -1,6 +1,4 @@
 ;; init.el --- Emacs configuration
-;;(load-theme 'doom-opera)
-;;(hl-line-mode)
 
 ;; iTerm2 config
 ;; ITERM2 MOUSE SUPPORT
@@ -220,6 +218,10 @@
   :config
   (setq wich-key-idle-delay 0.3))
 
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :init (all-the-icons-ivy-rich-mode 1))
+
 (use-package ivy-rich
   :init
   (ivy-rich-mode 1))
@@ -335,6 +337,15 @@
 ;;  :straight (:type built-in)
   :config
   (global-so-long-mode))
+
+;; a mode to work with graphviz
+(use-package graphviz-dot-mode
+  :straight (graphviz-dot-mode :type git :host github :repo "ppareit/graphviz-dot-mode")
+  :ensure t
+  :config
+  (setq graphviz-dot-indent-width 4))
+;; (use-package company-graphviz-dot
+;;   :straight (company-graphviz-dot type: git :host github :repo "ppareit/graphviz-dot-mode/company-graphviz-dot.el"))
 
 ;; center org-buffers
 (defun sp/org-mode-visual-fill ()
@@ -572,20 +583,9 @@
 (global-set-key [remap dabbrev-expand] 'hippie-expand)
 
 ;; completion in prog-mode
-(use-package svg-lib
-  :straight (svg-lib :type git :host github :repo "rougier/svg-lib"))
-
-(use-package kind-icon
-  :ensure t
-  :after corfu
-  :custom
-  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
 (use-package corfu
   :config
-  (add-to-list 'corfu-margin-formatters #'+corfu-icons-margin-formatter)
+;  (add-to-list 'corfu-margin-formatters #'+corfu-icons-margin-formatter)
   (global-corfu-mode))
 
 ;; fuzzy search for corfu
@@ -639,6 +639,23 @@
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
   (add-to-list 'completion-at-point-functions #'cape-line)
 )
+
+(use-package svg-lib
+  :straight (svg-lib :type git :host github :repo "rougier/svg-lib"))
+
+(use-package kind-icon
+  :ensure t
+  :after corfu
+  :custom
+  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+  (add-hook 'my-completion-ui-mode-hook
+   	    (lambda ()
+   	      (setq completion-in-region-function
+   		    (kind-icon-enhance-completion
+   		     completion-in-region-function)))))
+
 
 ;; Language Servers
 (use-package lsp-mode
