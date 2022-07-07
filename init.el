@@ -1,47 +1,6 @@
 ;; init.el --- Emacs configuration
 
-;; iTerm2 config
-;; ITERM2 MOUSE SUPPORT
-(unless window-system
-  (require 'mouse)
-  (xterm-mouse-mode t)
-  (defun track-mouse (e)) 
-  (setq mouse-sel-mode t))
-
-;; set the default font InconsolataLGC NF
-(set-face-attribute 'default nil :font "Ubuntu Mono")
-;; enlarge the defaul font size
-(set-face-attribute 'default nil :height 145)
-
-;; use ESC to cancel promt
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;; Start maximised (cross-platf)
-(add-hook 'window-setup-hook 'toggle-frame-maximized t)
-
-;; stop emacs expecting that a sentence ends with double space
-(setq sentence-end-double-space nil)
-;; stretch cursor to full char.-width, i.e. make tabs visible
-(setq x-stretch-cursor t)
-;; show recent files with M-x recentf-open-file
-(recentf-mode 1)
-;; automatically update buffer with changed files
-(global-auto-revert-mode 1)
-(setq global-auto-revert-non-file-buffers t)
-;; INSTALL PACKAGES
-;; --------------------------------------
-
-(require 'package)
-
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			 ("org" . "https://orgmode.org/elpa/")
-			 ("elpa" . "https://elpa.gnu.org/packages/")))
-
-(package-initialize)
-(unless 'package-archives-contents
-  (package-refresh-contents))
-
-;; trying straight.el
+;; straight.el to manage packages
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -55,129 +14,19 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+;; make straight.el aware of use-package
 (straight-use-package 'use-package)
 
-;; initialize use-package
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
+;; make sure use-package always uses staight.el
+(setq straight-use-package-by-default t) 
 
-(require 'use-package)
-(setq use-package-always-ensure t)
-
-(use-package guru-mode
-  :init (guru-global-mode +1))
-
-;; IVY
-(use-package ivy)
-(global-set-key (kbd "C-c o") 'counsel-outline)
-(ivy-mode 1)
-
-;; amx to help with ivy-m-x suggestions 
-(use-package amx
-  :ensure t
-  :after ivy
-  :custom
-  (amx-backend 'auto)
-  (amx-save-file "~/Documents/personal/emacs/amx-items")
-  (amx-history-length 50)
-  :config
-  (amx-mode 1))
-
-;; track changes in the buffer in a tree-like structure
-(use-package undo-tree
-  :config
-  (global-undo-tree-mode 1))
-
-;; Doom-modeline
-(use-package all-the-icons)
-
-(use-package all-the-icons-dired
-  :hook (dired-mode . all-the-icons-dired-mode))
-
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1))
-
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t
-	doom-themes-enable-italic t)
-  (load-theme 'catppuccin t)
-;;   (load-theme 'doom-monokai-spectrum t)
-
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
-
-(use-package catppuccin-theme
- :config
- (setq catppuccin-height-title1 1.5))
-
-(use-package dashboard
-  :ensure t
-  :config
-  (dashboard-setup-startup-hook))
-
-;; BASIC CUSTOMIZATION
-;; --------------------------------------
-
-;; Config to keep the cursor at the center of the screen
-;; source: https://protesilaos.com/codelog/2020-07-16-emacs-focused-editing/
-(use-package emacs
-  :config
-  (setq-default scroll-preserve-screen-position t)
-  (setq-default scroll-conservatively 1) ; affects `scroll-step'
-  (setq-default scroll-margin 0)
-
-  (define-minor-mode sp/scroll-centre-cursor-mode
-    "Toggle centred cursor scrolling behaviour."
-    :init-value nil
-    :lighter " S="
-    :global nil
-    (if sp/scroll-centre-cursor-mode
-        (setq-local scroll-margin (* (frame-height) 2)
-                    scroll-conservatively 0
-                    maximum-scroll-margin 0.5)
-      (dolist (local '(scroll-preserve-screen-position
-                       scroll-conservatively
-                       maximum-scroll-margin
-                       scroll-margin))
-        (kill-local-variable `,local))))
-
-  ;; C-c l is used for `org-store-link'.  The mnemonic for this is to
-  ;; focus the Line and also works as a variant of C-l.
-  :bind ("C-c L" . sp/scroll-centre-cursor-mode))
-
-
-;; cycle selection regions
-(use-package expand-region
-  :bind ("C-=" . er/expand-region))
-;; a company to expand-region--change selected stuff
-(use-package change-inner
-  :bind
-  ("M-i" . change-inner)
-  ("M-n" . change-outer))
-
-;; quickly embrace text in stuff like quotes
-(use-package embrace
-  :ensure t
-  :config
-  (global-set-key (kbd "C-0") #'embrace-commander))
-
-(use-package multiple-cursors
-  :bind
-  ("C-`" . 'mc/edit-lines))
-
-;; store and manage window configuration
-;; C-c <left> and C-c <right>
-(winner-mode 1)
-
-(use-package ace-window)
-(global-set-key (kbd "M-o") 'ace-window)
-
+;; iTerm2 config
+;; ITERM2 MOUSE SUPPORT
+(unless window-system
+  (require 'mouse)
+  (xterm-mouse-mode t)
+  (defun track-mouse (e)) 
+  (setq mouse-sel-mode t))
 
 (setq inhibit-startup-message t) ;; hide the startup message
 (scroll-bar-mode -1)        ; Disable visible scrollbar
@@ -205,29 +54,189 @@
 
 (setq visible-bell t)
 
+;; set the default font InconsolataLGC NF
+(set-face-attribute 'default nil :font "Ubuntu Mono")
+;; enlarge the defaul font size
+(set-face-attribute 'default nil :height 145)
+
+;; use ESC to cancel promt
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+;; Start maximised (cross-platf)
+(add-hook 'window-setup-hook 'toggle-frame-maximized t)
+
+;; stop emacs expecting that a sentence ends with double space
+(setq sentence-end-double-space nil)
+;; stretch cursor to full char.-width, i.e. make tabs visible
+(setq x-stretch-cursor t)
+;; show recent files with M-x recentf-open-file
+(recentf-mode 1)
+;; automatically update buffer with changed files
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
+;; INSTALL PACKAGES
+;; --------------------------------------
+
+(use-package guru-mode
+  :straight t
+  :init (guru-global-mode +1))
+
+;; IVY
+(use-package ivy
+  :straight t
+  :config
+  (global-set-key (kbd "C-c o") 'counsel-outline)
+  (ivy-mode 1))
+
+;; amx to help with ivy-m-x suggestions 
+(use-package amx
+  :straight t
+  :after ivy
+  :custom
+  (amx-backend 'auto)
+  (amx-save-file "~/Documents/personal/emacs/amx-items")
+  (amx-history-length 50)
+  :config
+  (amx-mode 1))
+
+;; track changes in the buffer in a tree-like structure
+(use-package undo-tree
+  :straight t
+  :config
+  (global-undo-tree-mode 1))
+
+;; Doom-modeline
+(use-package all-the-icons
+  :straight t)
+
+(use-package all-the-icons-dired
+  :straight t
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+(use-package doom-modeline
+  :straight t
+  :init (doom-modeline-mode 1))
+
+(use-package doom-themes
+  :straight t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t
+	doom-themes-enable-italic t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
+
+(use-package catppuccin-theme
+  :straight t
+  :config
+  (setq catppuccin-height-title1 1.5)
+  (load-theme 'catppuccin t))
+
+(use-package dashboard
+  :straight t
+  :config
+  (dashboard-setup-startup-hook))
+
+;; BASIC CUSTOMIZATION
+;; --------------------------------------
+
+;; Config to keep the cursor at the center of the screen
+;; source: https://protesilaos.com/codelog/2020-07-16-emacs-focused-editing/
+(use-package emacs
+  :straight nil
+  :config
+  (setq-default scroll-preserve-screen-position t)
+  (setq-default scroll-conservatively 1) ; affects `scroll-step'
+  (setq-default scroll-margin 0)
+
+  (define-minor-mode sp/scroll-centre-cursor-mode
+    "Toggle centred cursor scrolling behaviour."
+    :init-value nil
+    :lighter " S="
+    :global nil
+    (if sp/scroll-centre-cursor-mode
+        (setq-local scroll-margin (* (frame-height) 2)
+                    scroll-conservatively 0
+                    maximum-scroll-margin 0.5)
+      (dolist (local '(scroll-preserve-screen-position
+                       scroll-conservatively
+                       maximum-scroll-margin
+                       scroll-margin))
+        (kill-local-variable `,local))))
+
+  ;; C-c l is used for `org-store-link'.  The mnemonic for this is to
+  ;; focus the Line and also works as a variant of C-l.
+  :bind ("C-c L" . sp/scroll-centre-cursor-mode))
+
+
+;; cycle selection regions
+(use-package expand-region
+  :straight t
+  :bind ("C-=" . er/expand-region))
+
+;; a company to expand-region--change selected stuff
+(use-package change-inner
+  :straight t
+  :bind
+  ("M-i" . change-inner)
+  ("M-n" . change-outer))
+
+;; quickly embrace text in stuff like quotes
+(use-package embrace
+  :straight t
+  :config
+  (global-set-key (kbd "C-0") #'embrace-commander))
+
+(use-package multiple-cursors
+  :straight t
+  :bind
+  ("C-`" . 'mc/edit-lines))
+
+;; store and manage window configuration
+;; C-c <left> and C-c <right>
+(use-package winner
+  :straight nil
+  :config
+ (winner-mode 1))
+
+(use-package ace-window
+  :straight t
+  :config
+  (global-set-key (kbd "M-o") 'ace-window))
+
+
 (use-package rainbow-delimiters
+  :straight t
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package avy
-  :ensure t
+  :straight t
   :bind (("M-s" . avy-goto-word-1)))
 
 (use-package which-key
+  :straight t
   :init (which-key-mode)
   :diminish which-key-mode
   :config
   (setq wich-key-idle-delay 0.3))
 
 (use-package all-the-icons-ivy-rich
-  :ensure t
+  :straight t
   :init (all-the-icons-ivy-rich-mode 1))
 
 (use-package ivy-rich
+  :straight t
+  :after counsel
   :init
   (ivy-rich-mode 1))
 
 ;; history of minibuffer
 (use-package savehist
+  :straight t
   :config
   (setq savehist-file (locate-user-emacs-file "savehist"))
   (setq history-length 10000)
@@ -236,6 +245,7 @@
   (savehist-mode))
 
 (use-package counsel
+  :straight t
   :bind (("M-x" . counsel-M-x)
 	 ("C-x b" . counsel-ibuffer)
 	 ("C-x C-f" . counsel-find-file)
@@ -252,12 +262,13 @@
 
 ;; help with automatic parenthesis input
 (use-package smartparens
-  :ensure smartparens
+  :straight t
   :config (progn (show-smartparens-global-mode t)))
 (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
 (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
 
 (use-package helpful
+  :straight t
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -270,17 +281,20 @@
 
 ;; Language Tool
 ;;(setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/5.6/libexec/languagetool-commandline.jar")
-(setq langtool-language-tool-jar "/Users/psd/language-tool/LanguageTool-5.7-stable/languagetool-commandline.jar")
-(require 'langtool)
-(setq langtool-default-language "en-US")
-(global-set-key "\C-x4w" 'langtool-check)
-(global-set-key "\C-x4W" 'langtool-check-done)
-(global-set-key "\C-x4l" 'langtool-switch-default-language)
-(global-set-key "\C-x44" 'langtool-show-message-at-point)
-(global-set-key "\C-x4w" 'langtool-check)
-(global-set-key "\C-x4W" 'langtool-check-done)
-(global-set-key "\C-x4l" 'langtool-switch-default-language)
-(global-set-key "\C-x44" 'langtool-show-message-at-point)
+
+(use-package langtool
+  :straight t
+  :config
+  (setq langtool-language-tool-jar "/Users/psd/language-tool/LanguageTool-5.7-stable/languagetool-commandline.jar")
+  (setq langtool-default-language "en-US")
+  (global-set-key "\C-x4w" 'langtool-check)
+  (global-set-key "\C-x4W" 'langtool-check-done)
+  (global-set-key "\C-x4l" 'langtool-switch-default-language)
+  (global-set-key "\C-x44" 'langtool-show-message-at-point)
+  (global-set-key "\C-x4w" 'langtool-check)
+  (global-set-key "\C-x4W" 'langtool-check-done)
+  (global-set-key "\C-x4l" 'langtool-switch-default-language)
+  (global-set-key "\C-x44" 'langtool-show-message-at-point))
 
 ;; org-mode config
 ;; Do not ask for confirmation when evaluation a block
@@ -315,26 +329,26 @@
 
 ;; some help with focus
 (use-package dimmer
-  :ensure t
+  :straight t
   :config
   (dimmer-configure-which-key)
   (dimmer-mode t)
   (setq dimmer-fraction 0.5))
 
 (use-package focus
-  :ensure t
+  :straight t
   :config
   (focus-mode t))
 
 (use-package volatile-highlights
-  :ensure t
+  :straight t
   :config
   (volatile-highlights-mode t))
 
 ;; Let emacs to decide what to do with very long lines
 (use-package so-long
 ;;  :after-call find-file-hook
-;;  :straight (:type built-in)
+  :straight t
   :config
   (global-so-long-mode))
 
@@ -354,10 +368,12 @@
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
+  :straight t
   :hook (org-mode . sp/org-mode-visual-fill)
   :hook (markdown-mode . sp/org-mode-visual-fill))
 
 (use-package org
+  :straight t
   :hook (org-mode . sp/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
@@ -376,23 +392,28 @@
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
 
-(use-package citeproc)
+(use-package citeproc
+  :straight t)
 (setq org-cite-csl-styles-dir "~/Zotero/styles")
-(require 'oc-csl)
+
+;; (use-package oc-csl
+;;   :straight t)
 
 ;; This is needed as of Org 9.2
-(require 'org-tempo)
+;; (use-package org-tempo
+;;   :straight t)
 
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 
 (use-package org-bullets
-  :ensure t
+  :straight t
   :hook (org-mode . org-bullets-mode))
 
 ;; help org and markdown to align tables
 (use-package valign
+  :straight t
 ;;  :after-call org-mode-hook
   :hook (org-mode . valign-mode)
   :config
@@ -424,7 +445,7 @@
 ;;                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 (use-package org-roam
-  :ensure t
+  :straight t
   :init
   (setq org-roam-v2-ack t)
   :custom
@@ -441,25 +462,19 @@
 
 ;; setup markdown-mode
 (use-package markdown-mode
-  :ensure t
+  :straight t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :init ((setq markdown-command "multimarkdown")
-	 (setq markdown-disable-tooltip-prompt 1)))
-
-(use-package imenu-list
-  :ensure t
-  :bind (("C-'" . imenu-list-smart-toggle))
-  :config
-  (setq imenu-list-focus-after-activation t
-        imenu-list-auto-resize nil))
+  :init 
+ ;(setq markdown-command "")
+  (setq markdown-disable-tooltip-prompt 1))
 
 ;; set-up bibligraphy work-flow
 (ivy-mode 1)
 (use-package ivy-bibtex
-  :ensure t)
+  :straight t)
 
 (autoload 'ivy-bibtex "ivy-bibtex" "" t)
 
@@ -499,18 +514,20 @@
 ;  (setq conda-env-home-directory (expand-file-name "/usr/local/Caskroom/miniforge/base/envs"))
 
 ;; Magit config
-(use-package magit)
+(use-package magit
+  :straight t)
 
 ;; support for Graphviz and DOT
 (use-package graphviz-dot-mode
-  :ensure t
+  :straight t
   :config
   (setq graphviz-dot-indent-width 4))
 
 ;(use-package company-graphviz-dot)  ; at the moment it is unavailable on melpa
 
 ;; R and S-family languages
-(use-package ess)
+(use-package ess
+  :straight t)
 ;; An example of window configuration:
 (setq display-buffer-alist '(("*R Dired"
          (display-buffer-reuse-window display-buffer-at-bottom)
@@ -531,16 +548,17 @@
          (reusable-frames . nil))))
 ;; help with RMarkdown
 (use-package poly-markdown
-  :ensure t)
+  :straight t)
 (add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown-mode))
 ;; some help with Rmd files
 (use-package poly-R
-  :ensure t)
+  :straight t)
 ;; support for Julia
-(use-package julia-mode)
+(use-package julia-mode
+  :straight t)
 
 (use-package elpy
-  :ensure t
+  :straight t
   :init
   (elpy-enable))
 
@@ -552,13 +570,14 @@
 (setq elpy-rpc-python-command "python3")
 
 ;; configure PATH for latex
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
+;(when (memq window-system '(mac ns x))
+;  (exec-path-from-shell-initialize))
 
 (setq-default TeX-master nil)
 
 ;; pdf-tools test
 (use-package pdf-tools
+  :straight t
   :defer t
   :commands (pdf-view-mode pdf-tools-install)
   :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
@@ -584,12 +603,14 @@
 
 ;; completion in prog-mode
 (use-package corfu
+  :straight t
   :config
 ;  (add-to-list 'corfu-margin-formatters #'+corfu-icons-margin-formatter)
   (global-corfu-mode))
 
 ;; fuzzy search for corfu
 (use-package orderless
+  :straight t
   :init
   ;; Configure a custom style dispatcher (see the Consult WiFi)
   ;;(setq orderless-style-dispatchers '(+orderless-dispatch)
@@ -599,6 +620,7 @@
         completion-category-overrides '((file (styles . (partial-completion))))))
 
 (use-package corfu-doc
+  :straight t
   :init
   (global-corfu-mode)
   :hook
@@ -606,6 +628,7 @@
 
 ;; Add extensions
 (use-package cape
+  :straight t
   ;; Bind dedicated completion commands
   ;; Alternative prefix keys: C-c p, M-p, M-+, ...
   :bind (("C-c p p" . completion-at-point) ;; capf
@@ -644,7 +667,7 @@
   :straight (svg-lib :type git :host github :repo "rougier/svg-lib"))
 
 (use-package kind-icon
-  :ensure t
+  :straight t
   :after corfu
   :custom
   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
@@ -659,6 +682,7 @@
 
 ;; Language Servers
 (use-package lsp-mode
+  :straight t
   :custom
   (lsp-completion-provider :none) ;; we use Corfu!
   :init
@@ -670,7 +694,7 @@
   (python-mode . lsp))
 
 (use-package lsp-jedi
-  :ensure t
+  :straight t
   :config
   (with-eval-after-load "lsp-mode"
     (add-to-list 'lsp-disabled-clients 'pyls)
@@ -679,16 +703,18 @@
 ;; Configure terminals
 
 (use-package term
+  :straight t
   :config
   (setq explicit-shell-file-name "bash")
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
 
 (use-package eterm-256color
+  :straight t
   :hook (term-mode . eterm-256color-mode))
 
 ;; Dired Configuration
 (use-package dired
-  :ensure nil
+  :straight nil
   :commands (dired dired-jump)
   :bind (("C-x C-j" . dired-jump))
   :config
@@ -701,34 +727,39 @@
 
 ;; hide dot files by default
 (use-package dired-hide-dotfiles
+  :straight t
   :hook (dired-mode . dired-hide-dotfiles-mode)
   :config
   (define-key dired-mode-map "." 'dired-hide-dotfiles-mode))
 
 ;; Spelling and Writing
 (use-package flycheck
-  :ensure t
+  :straight t
   :init (global-flychek-mode)
   :config
   (flycheck-add-mode 'proselint 'org-mode))
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
 (use-package beacon
+  :straight t
   :config
   (beacon-mode 1))
 
 (use-package yasnippet
+  :straight t
   :config
   (setq yas-snippet-dirs
 	'("~/Documents/personal/snippets"))  ;;my snippets are here
   (yas-global-mode 1))
 
-(use-package writeroom-mode)
+(use-package writeroom-mode
+  :straight t)
 
 (defalias 'fm 'fly-spell-mode)
 (defalias 'ss 'ispell-buffer)
 
 (use-package ispell  ;; use aspell instead of ispell which is no longer maintained
+  :straight t
   :no-require t
   :config
   (setq-default ispell-program-name "/usr/local/bin/aspell")  ;; testing if it will hell to restore spellchecking
@@ -737,12 +768,22 @@
   (setq ispell-silently-savaep t))
 
 (use-package flyspell
+  :straight t
   :defer t
   :init
   (progn
     (add-hook 'message-mode-hook 'turn-on-flyspell)
     (add-hook 'org-mode-hook 'flyspell-mode)
     (defalias 'fm flyspell-mode)))
+
+(use-package flyspell-correct
+  :straight t
+  :after flyspell
+  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-wrapper)))
+
+(use-package flyspell-correct-ivy
+  :straight t
+  :after flyspell-correct)
 
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)

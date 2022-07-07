@@ -186,7 +186,7 @@ Adjust a set of basic defaults:
       (defun track-mouse (e)) 
       (setq mouse-sel-mode t))
 #+end_src
-** Visual Experience
+* Visual Experience
 This part is complex and it is not organized well at the moment. Overall, it changes default font, how buffers look, and adds and changes some UI parameters. This also sets the theme.
 
 #+begin_src emacs-lisp :eval never
@@ -246,7 +246,7 @@ This part is complex and it is not organized well at the moment. Overall, it cha
 
 #+end_src
 
-*** UI and navigation
+* UI and navigation
 GNU Emacs is the best with a completion framework in the mini-buffer. Such framework can quickly filter through lists of option to find the right thing you want to do. This is especially helpful when you are not as familiar with a mode to rely completely on key-binding.
 
 There are several approaches to completion in the mini-buffer. My current configuration relies on =IVY=. Although, I am thinking about replacing it with something less heavy and a bit more modern. =IVY= comes with a set of extensions called =counsel= that plug it =IVY= into standard Emacs command like search. Overall, such set up aims to improve discoverability actions and other stuff in Emacs.
@@ -325,4 +325,37 @@ Navigation in Emacs is not limited to the mini-buffer. There is navigation betwe
           :bind (("M-s" . avy-goto-word-1)))
   #+end_src
 
+** A guide to navigation
+  
+* Writing
+
+** Org-mode
+
+** Exporting
+
+** =Markdown-mode=
+
+* Coding
+
+** Code completion
+
+** R -- Emacs Speaks Statistics 
+
+*** Rmarkdown
+
+** Python -- =Elpy= and =conda=
+
+*** =Elpy=
+
+*** =Conda=
+
+** Graphviz and DOT
+
+** 
+
+* Version control
+
+** =Magit=
+
+* Final Touches
 
