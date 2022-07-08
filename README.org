@@ -158,7 +158,8 @@ Adjust a set of basic defaults:
                   pdf-tools))
     (add-hook mode(lambda () (setq display-line-numbers nil))))
 
-  (setq visible-bell t)
+  (setq
+visible-bell t)
   ;; Configure terminals
 
   (use-package term

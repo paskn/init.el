@@ -20,6 +20,7 @@
 ;; make sure use-package always uses staight.el
 (setq straight-use-package-by-default t) 
 
+
 ;; iTerm2 config
 ;; ITERM2 MOUSE SUPPORT
 (unless window-system
@@ -54,7 +55,7 @@
 
 (setq visible-bell t)
 
-;; set the default font InconsolataLGC NF
+;; set the default font 
 (set-face-attribute 'default nil :font "Ubuntu Mono")
 ;; enlarge the defaul font size
 (set-face-attribute 'default nil :height 145)
@@ -86,7 +87,8 @@
   :straight t
   :config
   (global-set-key (kbd "C-c o") 'counsel-outline)
-  (ivy-mode 1))
+  (ivy-mode 1)
+  (setq ivy-display-style 'fancy))
 
 ;; amx to help with ivy-m-x suggestions 
 (use-package amx
@@ -129,7 +131,6 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-
 (use-package catppuccin-theme
   :straight t
   :config
@@ -138,6 +139,7 @@
 
 (use-package dashboard
   :straight t
+  :after org
   :config
   (dashboard-setup-startup-hook))
 
@@ -258,7 +260,7 @@
 
 ;; change the standart isearch C-s with swiper
 (global-set-key (kbd "C-s") 'swiper)
-(setq ivy-display-style 'fancy)
+
 
 ;; help with automatic parenthesis input
 (use-package smartparens
@@ -373,9 +375,10 @@
   :hook (markdown-mode . sp/org-mode-visual-fill))
 
 (use-package org
-  :straight t
+  :straight (:type built-in)
   :hook (org-mode . sp/org-mode-setup)
   :config
+  (setq org-fold-core-style 'overlays)
   (setq org-ellipsis " ▾")
   (setq org-agenda-files
 	'("~/Documents/personal/Tasks.org"
@@ -386,26 +389,74 @@
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
-  (setq display-line-numbers nil))
+  (global-set-key (kbd "C-c l") 'org-store-link)
+  (global-set-key (kbd "C-c a") 'org-agenda)
+  (global-set-key (kbd "C-c c") 'org-capture)
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (setq org-todo-keywords
+  '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+    (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+  ;; Configure custom agenda views
+(setq org-agenda-custom-commands
+  '(("d" "Dashboard"
+     ((agenda "" ((org-deadline-warning-days 7)))
+      (todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))
+      (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
-(global-set-key (kbd "C-c l") 'org-store-link)
-(global-set-key (kbd "C-c a") 'org-agenda)
-(global-set-key (kbd "C-c c") 'org-capture)
+    ("n" "Next Tasks"
+     ((todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))))
+
+
+    ("W" "Work Tasks" tags-todo "+work")
+
+    ;; Low-effort next actions
+    ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+     ((org-agenda-overriding-header "Low Effort Tasks")
+      (org-agenda-max-todos 20)
+      (org-agenda-files org-agenda-files)))
+
+    ("w" "Workflow Status"
+     ((todo "WAIT"
+            ((org-agenda-overriding-header "Waiting on External")
+             (org-agenda-files org-agenda-files)))
+      (todo "REVIEW"
+            ((org-agenda-overriding-header "In Review")
+             (org-agenda-files org-agenda-files)))
+      (todo "PLAN"
+            ((org-agenda-overriding-header "In Planning")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "BACKLOG"
+            ((org-agenda-overriding-header "Project Backlog")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "READY"
+            ((org-agenda-overriding-header "Ready for Work")
+             (org-agenda-files org-agenda-files)))
+      (todo "ACTIVE"
+            ((org-agenda-overriding-header "Active Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "COMPLETED"
+            ((org-agenda-overriding-header "Completed Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "CANC"
+            ((org-agenda-overriding-header "Cancelled Projects")
+             (org-agenda-files org-agenda-files))))))))
+
 
 (use-package citeproc
-  :straight t)
-(setq org-cite-csl-styles-dir "~/Zotero/styles")
+  :straight t
+  :config
+  (setq org-cite-csl-styles-dir "~/Zotero/styles"))
+
 
 ;; (use-package oc-csl
 ;;   :straight t)
 
-;; This is needed as of Org 9.2
-;; (use-package org-tempo
-;;   :straight t)
-
-(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-(add-to-list 'org-structure-template-alist '("py" . "src python"))
 
 (use-package org-bullets
   :straight t
@@ -472,15 +523,15 @@
   (setq markdown-disable-tooltip-prompt 1))
 
 ;; set-up bibligraphy work-flow
-(ivy-mode 1)
 (use-package ivy-bibtex
-  :straight t)
+  :straight t
+  :after ivy
+  :config
+  (autoload 'ivy-bibtex "ivy-bibtex" "" t)
+  (global-set-key (kbd "C-M-,") 'ivy-bibtex-with-local-bibliography)
+  ;; ivy-restrict-to-matches
+  (global-set-key (kbd "M-'") 'ivy-mark))
 
-(autoload 'ivy-bibtex "ivy-bibtex" "" t)
-
-(global-set-key (kbd "C-M-,") 'ivy-bibtex-with-local-bibliography)
-;; ivy-restrict-to-matches
-(global-set-key (kbd "M-'") 'ivy-mark)
 
 (setq bibtex-completion-format-citation-functions
   '((org-mode      . bibtex-completion-format-citation-org-link-to-PDF)
@@ -560,14 +611,14 @@
 (use-package elpy
   :straight t
   :init
-  (elpy-enable))
-
-;; to setup elpy with python3
-(setq python-shell-interpreter "python3"
+  (elpy-enable)
+  :config
+  ;; to setup elpy with python3
+  (setq python-shell-interpreter "python3"
       python-shell-interpreter-args "-i")
 
-(setq elpy-rpc-virtualenv-path 'current)
-(setq elpy-rpc-python-command "python3")
+  (setq elpy-rpc-virtualenv-path 'current)
+(setq elpy-rpc-python-command "python3"))
 
 ;; configure PATH for latex
 ;(when (memq window-system '(mac ns x))
@@ -631,7 +682,7 @@
   :straight t
   ;; Bind dedicated completion commands
   ;; Alternative prefix keys: C-c p, M-p, M-+, ...
-  :bind (("C-c p p" . completion-at-point) ;; capf
+  :bind (("C-c p p" . incompletion-at-point) ;; capf
          ("C-c p t" . complete-tag)        ;; etags
          ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
          ("C-c p h" . cape-history)
@@ -681,24 +732,9 @@
 
 
 ;; Language Servers
-(use-package lsp-mode
-  :straight t
-  :custom
-  (lsp-completion-provider :none) ;; we use Corfu!
-  :init
-  (defun my/lsp-mode-setup-completion ()
-    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(orderless))) ;; Configure orderless
-  :hook
-  (lsp-completion-mode . my/lsp-mode-setup-completion)
-  (python-mode . lsp))
+(use-package eglot
+  :straight t)
 
-(use-package lsp-jedi
-  :straight t
-  :config
-  (with-eval-after-load "lsp-mode"
-    (add-to-list 'lsp-disabled-clients 'pyls)
-    (add-to-list 'lsp-enabled-clients 'jedi)))
 
 ;; Configure terminals
 
@@ -718,7 +754,7 @@
   :commands (dired dired-jump)
   :bind (("C-x C-j" . dired-jump))
   :config
-  (setq insert-directory-program "gls")
+  (setq insert-directory-program "/usr/local/bin/gls")
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches "-algho --group-directories-first"))
 
@@ -737,8 +773,9 @@
   :straight t
   :init (global-flychek-mode)
   :config
-  (flycheck-add-mode 'proselint 'org-mode))
-(add-hook 'after-init-hook #'global-flycheck-mode)
+  (flycheck-add-mode 'proselint 'org-mode)
+  (add-hook 'after-init-hook #'global-flycheck-mode))
+
 
 (use-package beacon
   :straight t
@@ -755,12 +792,13 @@
 (use-package writeroom-mode
   :straight t)
 
-(defalias 'fm 'fly-spell-mode)
-(defalias 'ss 'ispell-buffer)
+;; (defalias 'fm 'fly-spell-mode)
+;; (defalias 'ss 'ispell-buffer)
 
 (use-package ispell  ;; use aspell instead of ispell which is no longer maintained
   :straight t
-  :no-require t
+  :after flyspell
+;  :no-require t
   :config
   (setq-default ispell-program-name "/usr/local/bin/aspell")  ;; testing if it will hell to restore spellchecking
   (setq ispell-dictionary "american")
@@ -774,7 +812,11 @@
   (progn
     (add-hook 'message-mode-hook 'turn-on-flyspell)
     (add-hook 'org-mode-hook 'flyspell-mode)
-    (defalias 'fm flyspell-mode)))
+    (defalias 'fm flyspell-mode))
+  :config
+  (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'org-mode-hook 'turn-on-flyspell))
 
 (use-package flyspell-correct
   :straight t
@@ -785,48 +827,6 @@
   :straight t
   :after flyspell-correct)
 
-(add-hook 'text-mode-hook 'flyspell-mode)
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-(add-hook 'org-mode-hook 'turn-on-flyspell)
-
-(define-key ctl-x-map "\C-i"
-  #'endless/ispell-word-then-abbrev)
-
-(defun endless/simple-get-word ()
-  (car-safe (save-excursion (ispell-word nil))))
-
-(defun endless/ispell-word-then-abbrev (p)
-  "Call `ispell-word', then create an abbrev for it.
-With prefix P, create local abbrev. Otherwise it will
-be global.
-If there's nothing wrong with the word at point, keep
-looking for a typo until the beginning of buffer. You can
-skip typos you don't want to fix with `SPC', and you can
-abort completely with `C-g'."
-  (interactive "P")
-  (let (bef aft)
-    (save-excursion
-      (while (if (setq bef (endless/simple-get-word))
-                 ;; Word was corrected or used quit.
-                 (if (ispell-word nil 'quiet)
-                     nil ; End the loop.
-                   ;; Also end if we reach `bob'.
-                   (not (bobp)))
-               ;; If there's no word at point, keep looking
-               ;; until `bob'.
-               (not (bobp)))
-        (backward-word)
-        (backward-char))
-      (setq aft (endless/simple-get-word)))
-    (if (and aft bef (not (equal aft bef)))
-        (let ((aft (downcase aft))
-              (bef (downcase bef)))
-          (define-abbrev
-            (if p local-abbrev-table global-abbrev-table)
-            bef aft)
-          (message "\"%s\" now expands to \"%s\" %sally"
-                   bef aft (if p "loc" "glob")))
-      (user-error "No typo at or before point"))))
 
 (setq save-abbrevs 'silently)
 (setq-default abbrev-mode t)
@@ -887,5 +887,5 @@ abort completely with `C-g'."
      (340 . "#fff59d")
      (360 . "#8bc34a")))
  '(vc-annotate-very-old-color nil)
- '(warning-suppress-types '((use-package))))
+ '(warning-suppress-types '((use-package) (use-package) (use-package))))
 ;; init.el ends here
